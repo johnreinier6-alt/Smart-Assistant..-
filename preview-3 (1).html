@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;background:radial-gradient(circle at 20% 15%,rgba(82,215,255,.14),transparent 28%),radial-gradient(circle at 85% 20%,rgba(255,79,184,.18),transparent 32%),#0b0f18;color:#fff}
+.phone{width:390px;height:820px;background:#111827;border-radius:34px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.screen{display:none;height:100%;overflow-y:auto;padding:24px 20px 105px;background:linear-gradient(145deg,#101621,#172033 55%,#101621)}
+.screen.active{display:block}
+.center{min-height:100%;display:grid;place-items:center;text-align:center;padding-bottom:30px}
+.logo{width:86px;height:86px;margin:0 auto 22px;border-radius:26px;display:grid;place-items:center;background:linear-gradient(135deg,#52d7ff,#836dff,#ff4fb8);font-size:34px;font-weight:800}
+h1{font-size:34px;line-height:1.12}h2{font-size:24px}h3{font-size:16px}.muted{color:rgba(255,255,255,.68);font-size:12px;line-height:1.55}
+p{line-height:1.55}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
+.panel{background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.11);border-radius:18px;padding:16px;margin-bottom:14px;backdrop-filter:blur(14px)}
+.hero{border:0;background:linear-gradient(135deg,rgba(82,215,255,.18),rgba(255,79,184,.18)),rgba(255,255,255,.08)}
+.btn,.ghost,.back{width:100%;min-height:50px;margin-top:14px;border-radius:16px;color:white;font-weight:700;cursor:pointer}
+.btn{border:0;background:linear-gradient(135deg,#ff4fb8,#836dff);box-shadow:0 16px 30px rgba(255,79,184,.22)}
+.ghost,.back{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08)}
+.back{min-height:42px;width:auto;padding:0 16px;margin:0}
+input,select,textarea{width:100%;margin-top:12px;padding:13px 14px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.08);color:white;outline:none}
+input::placeholder{color:rgba(255,255,255,.45)}select option{background:#111827}textarea{min-height:105px;resize:none}
+ul{padding-left:18px;margin-top:10px}.list li{margin-bottom:8px;color:rgba(255,255,255,.74);font-size:12px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.stat,.feature{min-height:105px;display:flex;flex-direction:column;justify-content:space-between}
+.stat strong{font-size:25px;line-height:1}.feature span{width:36px;height:36px;border-radius:13px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-weight:800}
+.good{color:#24d18b}.warn{color:#ffbe55}.bad{color:#ff6b78}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.row:last-child{border-bottom:0;padding-bottom:0}.row-title{font-size:13px;font-weight:700}
+.pill{padding:6px 10px;border-radius:999px;background:rgba(36,209,139,.14);color:#24d18b;font-size:11px;font-weight:800}
+.sync{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.sync div{min-height:74px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.07);display:grid;place-items:center;text-align:center;font-size:11px;font-weight:700}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:12px}.chart-total{text-align:right}.chart-total strong{display:block;font-size:21px}.chart-total span{color:#24d18b;font-size:12px;font-weight:800}
+.income-chart{width:100%;height:auto;display:block}.grid-line{stroke:rgba(255,255,255,.08);stroke-width:1}.axis-label{fill:rgba(255,255,255,.56);font-size:10px;font-weight:700}
+.income-area{fill:url(#incomeFill)}.income-line{fill:none;stroke:url(#incomeStroke);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.income-dot{fill:#141a26;stroke:#52d7ff;stroke-width:4}.income-dot.featured{fill:#52d7ff;stroke:rgba(82,215,255,.28);stroke-width:8}
+.donut-wrap{display:grid;grid-template-columns:154px 1fr;align-items:center;gap:16px;margin-top:10px}
+.donut{width:154px;height:154px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#161c2b 0 50%,transparent 51%),conic-gradient(#ff4fb8 0 38%,#836dff 38% 64%,#52d7ff 64% 84%,#ffbe55 84% 100%)}
+.donut-center{width:92px;height:92px;border-radius:50%;background:rgba(11,15,24,.88);display:grid;place-items:center;text-align:center}.donut-center strong{font-size:18px}.donut-center span{font-size:10px;color:rgba(255,255,255,.65);font-weight:800}
+.legend{display:grid;gap:10px}.legend-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,.68)}.legend-name{display:flex;align-items:center;gap:9px}.dot{width:11px;height:11px;border-radius:50%}.legend-value{color:white;font-weight:800}
+.bars{display:grid;gap:12px;margin-top:12px}.bar-row{display:grid;grid-template-columns:92px 1fr 38px;gap:10px;align-items:center;font-size:12px;color:rgba(255,255,255,.68)}
+.track{height:9px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden}.fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#52d7ff,#ff4fb8)}
+.nav{position:absolute;left:14px;right:14px;bottom:14px;display:none;grid-template-columns:repeat(5,1fr);gap:4px;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(12,16,25,.94);backdrop-filter:blur(18px)}
+.nav button{min-height:48px;border:0;border-radius:14px;background:transparent;color:rgba(255,255,255,.6);font-size:10px;font-weight:800;cursor:pointer}.nav button.active{background:rgba(255,255,255,.1);color:white}.nav span{display:block;font-size:16px;margin-bottom:3px}
+@media(max-width:430px){body{padding:0}.phone{width:100%;height:100vh;border-radius:0;border:0}.donut-wrap{grid-template-columns:1fr;justify-items:center}.legend{width:100%}}
+</style>
+</head>
+
+<body>
+<div class="phone">
+
+<section class="screen active" id="startScreen">
+  <div class="center">
+    <div>
+      <div class="logo">SA</div>
+      <h1>Smart Assistant</h1>
+      <p class="muted" style="margin:12px auto 22px;max-width:310px;font-size:14px;">Turn your inventory into smart marketing and steady cash flow.</p>
+      <button class="btn" onclick="showScreen('groupScreen')">Continue</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="groupScreen">
+  <div class="top">
+    <button class="back" onclick="showScreen('startScreen')">Back</button>
+  </div>
+  <div class="panel hero">
+    <h2>BSBA Marketing Management 2B</h2>
+    <p class="muted">Group 4</p>
+  </div>
+  <div class="panel">
+    <h3>Members</h3>
+    <ul class="list">
+      <li>Balada, Sophia Isabelle C.</li>
+      <li>Dalawis, Francesca Juliana V.</li>
+      <li>Dantes, Marian Nicole Ann L.</li>
+      <li>Mallare, Princes Kate C.</li>
+      <li>Padua, Karina Criselle G.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h3>Assistance</h3>
+    <ul class="list">
+      <li>Caranay, John Reinier P.</li>
+      <li>Regalado, Wendel Mark G.</li>
+    </ul>
+  </div>
+  <button class="btn" onclick="showScreen('overviewScreen')">Next</button>
+</section>
+
+<section class="screen" id="overviewScreen">
+  <div class="top">
+    <button class="back" onclick="showScreen('groupScreen')">Back</button>
+  </div>
+
+  <div class="panel hero">
+    <h2>App Overview</h2>
+    <p class="muted">What the app does and why it is useful.</p>
+  </div>
+
+  <div class="panel">
+    <h3>What the App Does</h3>
+    <p class="muted">SMART ASSISTANT is an AI-powered business management platform designed to help online sellers manage and grow their digital business in one centralized system.</p>
+    <ul class="list">
+      <li>Inventory tracking</li>
+      <li>Sales analytics</li>
+      <li>AI-generated marketing campaigns</li>
+      <li>Customer behavior analysis</li>
+      <li>Multi-platform store integration</li>
+      <li>Profit-safe promotional tools</li>
+      <li>Cash flow monitoring</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3>Connected Platforms</h3>
+    <div class="sync">
+      <div>Shopee<br>Shop</div>
+      <div>TikTok<br>Shop</div>
+      <div>Lazada<br>Shop</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Target Users</h3>
+    <ul class="list">
+      <li>Online sellers</li>
+      <li>MSMEs</li>
+      <li>Startup entrepreneurs</li>
+      <li>Social commerce sellers</li>
+      <li>Dropshipping and reselling businesses</li>
+      <li>Digital business owners managing multiple online platforms</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3>Business Problem Solved</h3>
+    <ul class="list">
+      <li>Managing multiple selling platforms separately</li>
+      <li>Manual inventory tracking</li>
+      <li>Inefficient promotional strategies</li>
+      <li>Lack of centralized business analytics</li>
+      <li>Difficulty monitoring customer behavior</li>
+      <li>Poor visibility of slow-moving products and sales trends</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3>Why It Is Useful</h3>
+    <ul class="list">
+      <li>Centralizes multiple online stores into one platform</li>
+      <li>Provides real-time sales and inventory monitoring</li>
+      <li>Generates AI-assisted marketing campaigns</li>
+      <li>Suggests profit-safe discounts and promotions</li>
+      <li>Tracks customer engagement and buying behavior</li>
+      <li>Helps identify best-selling and slow-moving products</li>
+      <li>Improves operational efficiency and business growth</li>
+    </ul>
+  </div>
+
+  <button class="btn" onclick="showScreen('loginScreen')">Proceed to Login</button>
+</section>
+
+<section class="screen" id="loginScreen">
+  <div class="top">
+    <button class="back" onclick="showScreen('overviewScreen')">Back</button>
+  </div>
+  <div class="panel hero">
+    <h2>Welcome Back</h2>
+    <p class="muted">Login or create an account to access your Smart Assistant dashboard.</p>
+  </div>
+  <div class="panel">
+    <h3>Login</h3>
+    <input type="email" placeholder="Email address">
+    <input type="password" placeholder="Password">
+    <button class="btn" onclick="showScreen('ordersScreen')">Log In</button>
+    <button class="ghost" onclick="showScreen('signupScreen')">Create Account</button>
+  </div>
+</section>
+
+<section class="screen" id="signupScreen">
+  <div class="top">
+    <button class="back" onclick="showScreen('loginScreen')">Back</button>
+  </div>
+  <div class="panel">
+    <h2>Create Account</h2>
+    <input type="text" placeholder="Full name">
+    <input type="text" placeholder="Business name">
+    <input type="email" placeholder="Email address">
+    <input type="password" placeholder="Password">
+    <button class="btn" onclick="showScreen('ordersScreen')">Sign Up</button>
+  </div>
+</section>
+
+<section class="screen" id="ordersScreen">
+  <div class="top"><div><h2>Orders</h2><p class="muted">Sales overview, cash flow summary, and inventory alerts.</p></div></div>
+
+  <div class="grid">
+    <div class="panel stat"><span class="muted">Sales Today</span><strong>PHP 58.4K</strong><span class="good">+14.2%</span></div>
+    <div class="panel stat"><span class="muted">Cash Flow</span><strong>PHP 31.9K</strong><span class="good">Healthy</span></div>
+    <div class="panel stat"><span class="muted">Open Orders</span><strong>142</strong><span class="warn">18 pending</span></div>
+    <div class="panel stat"><span class="muted">Inventory Alerts</span><strong>9</strong><span class="bad">3 urgent</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="chart-head"><div><h3>Income Graph</h3><p class="muted">Updated cash flow trend</p></div><div class="chart-total"><strong>PHP 58.4K</strong><span>+14.2%</span></div></div>
+    <svg class="income-chart" viewBox="0 0 320 190">
+      <defs>
+        <linearGradient id="incomeStroke" x1="0" x2="1"><stop offset="0%" stop-color="#52d7ff"/><stop offset="52%" stop-color="#836dff"/><stop offset="100%" stop-color="#ff4fb8"/></linearGradient>
+        <linearGradient id="incomeFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#ff4fb8" stop-opacity=".32"/><stop offset="100%" stop-color="#ff4fb8" stop-opacity="0"/></linearGradient>
+      </defs>
+      <line class="grid-line" x1="8" y1="35" x2="312" y2="35"/><line class="grid-line" x1="8" y1="80" x2="312" y2="80"/><line class="grid-line" x1="8" y1="125" x2="312" y2="125"/>
+      <path class="income-area" d="M15 132 C45 118,58 92,86 98 C116 105,124 67,154 73 C184 79,192 40,220 48 C250 56,260 28,305 22 L305 160 L15 160 Z"/>
+      <path class="income-line" d="M15 132 C45 118,58 92,86 98 C116 105,124 67,154 73 C184 79,192 40,220 48 C250 56,260 28,305 22"/>
+      <circle class="income-dot" cx="15" cy="132" r="5"/><circle class="income-dot" cx="86" cy="98" r="5"/><circle class="income-dot" cx="154" cy="73" r="5"/><circle class="income-dot" cx="220" cy="48" r="5"/><circle class="income-dot featured" cx="305" cy="22" r="6"/>
+      <text class="axis-label" x="10" y="182">Mon</text><text class="axis-label" x="72" y="182">Tue</text><text class="axis-label" x="137" y="182">Wed</text><text class="axis-label" x="204" y="182">Fri</text><text class="axis-label" x="282" y="182">Sun</text>
+    </svg>
+  </div>
+
+  <div class="panel">
+    <h3>Expense Distribution</h3>
+    <div class="donut-wrap">
+      <div class="donut"><div class="donut-center"><div><strong>21.8K</strong><span>EXPENSES</span></div></div></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-name"><span class="dot" style="background:#ff4fb8"></span>Ads</span><span class="legend-value">38%</span></div>
+        <div class="legend-item"><span class="legend-name"><span class="dot" style="background:#836dff"></span>Shipping</span><span class="legend-value">26%</span></div>
+        <div class="legend-item"><span class="legend-name"><span class="dot" style="background:#52d7ff"></span>Packaging</span><span class="legend-value">20%</span></div>
+        <div class="legend-item"><span class="legend-name"><span class="dot" style="background:#ffbe55"></span>Fees</span><span class="legend-value">16%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="inventoryScreen">
+  <div class="top"><div><h2>Inventory</h2><p class="muted">Product list, best sellers, and dusty stock alerts.</p></div></div>
+  <div class="panel"><h3>Best Sellers</h3><div class="bars">
+    <div class="bar-row"><span>Earbuds</span><div class="track"><div class="fill" style="width:92%"></div></div><strong>92%</strong></div>
+    <div class="bar-row"><span>Blender</span><div class="track"><div class="fill" style="width:78%"></div></div><strong>78%</strong></div>
+    <div class="bar-row"><span>Tripod</span><div class="track"><div class="fill" style="width:61%"></div></div><strong>61%</strong></div>
+  </div></div>
+  <div class="panel"><h3>Product List</h3>
+    <div class="row"><div><div class="row-title">Wireless Earbuds</div><p class="muted">18 units left</p></div><span class="bad">Low</span></div>
+    <div class="row"><div><div class="row-title">Portable Blender</div><p class="muted">88 units left</p></div><span class="pill">Good</span></div>
+    <div class="row"><div><div class="row-title">Mini Tripod</div><p class="muted">11 units left</p></div><span class="warn">Restock</span></div>
+  </div>
+  <div class="panel"><h3>Dusty Stock Alerts</h3>
+    <div class="row"><div><div class="row-title">Phone Ring Light</div><p class="muted">No sale in 31 days</p></div><span class="warn">Promo</span></div>
+    <div class="row"><div><div class="row-title">Desk Organizer</div><p class="muted">No sale in 26 days</p></div><span class="warn">Bundle</span></div>
+  </div>
+</section>
+
+<section class="screen" id="customersScreen">
+  <div class="top"><div><h2>Customer Insights</h2><p class="muted">Customer categories, purchase history, and recommended targets.</p></div></div>
+  <div class="grid">
+    <div class="panel feature"><span>A</span><h3>VIP Buyers</h3><p class="muted">426 customers</p></div>
+    <div class="panel feature"><span>B</span><h3>Repeat Buyers</h3><p class="muted">1,204 customers</p></div>
+    <div class="panel feature"><span>C</span><h3>At Risk</h3><p class="muted">188 customers</p></div>
+    <div class="panel feature"><span>D</span><h3>New Leads</h3><p class="muted">792 customers</p></div>
+  </div>
+  <div class="panel"><h3>Purchase History</h3>
+    <div class="row"><div><div class="row-title">Maria L.</div><p class="muted">5 purchases, PHP 8.2K total</p></div><span class="pill">VIP</span></div>
+    <div class="row"><div><div class="row-title">Andre P.</div><p class="muted">2 purchases, last order 42 days ago</p></div><span class="warn">Win Back</span></div>
+  </div>
+  <div class="panel hero"><h3>Recommended Marketing Targets</h3><p class="muted">Send a bundle offer to repeat buyers who bought earbuds but have not bought accessories.</p><button class="btn" onclick="showScreen('campaignScreen')">Create Campaign</button></div>
+</section>
+
+<section class="screen" id="campaignScreen">
+  <div class="top"><div><h2>Campaign Generator</h2><p class="muted">Promotion suggestions, discount calculator, and automated message draft.</p></div></div>
+  <div class="panel hero"><h3>Promotion Suggestion</h3><p class="muted">Suggested promo: 12% discount keeps projected margin at 31% after platform fees.</p></div>
+  <div class="panel"><h3>Discount Calculator</h3><input type="number" value="899"><input type="number" value="12"><button class="btn" onclick="calculateMargin()">Calculate Margin</button><p class="muted" id="marginResult">Estimated profit after discount: PHP 214 per unit.</p></div>
+  <div class="panel"><h3>Automated Message Draft</h3><textarea>Hi [Name], your favorite seller has a limited bundle deal for you. Get 12% off today and enjoy priority shipping on your next order.</textarea><button class="ghost">Regenerate Draft</button></div>
+</section>
+
+<section class="screen" id="profileScreen">
+  <div class="top"><div><h2>Profile</h2><p class="muted">Account information, settings, and subscription access.</p></div></div>
+  <div class="panel hero"><h3>Jennie Santos</h3><p class="muted">Owner, Jennie's Online Shop</p><p class="muted">Premium Monthly Plan</p></div>
+  <div class="panel"><h3>Account Info</h3>
+    <div class="row"><div><div class="row-title">Email</div><p class="muted">jennie@seller.com</p></div><span class="pill">Verified</span></div>
+    <div class="row"><div><div class="row-title">Business Type</div><p class="muted">Online retail seller</p></div><span class="pill">Active</span></div>
+  </div>
+  <div class="panel"><h3>Settings</h3><button class="ghost">Edit Profile</button><button class="ghost">Notification Settings</button><button class="btn" onclick="showScreen('subscriptionScreen')">Subscription</button><button class="ghost" onclick="showScreen('loginScreen')">Log Out</button></div>
+</section>
+
+<section class="screen" id="subscriptionScreen">
+  <div class="top">
+    <button class="back" onclick="showScreen('profileScreen')">Back</button>
+  </div>
+  <div class="panel hero"><h2>Subscription</h2><p class="muted">Plans, premium features, and membership perks.</p></div>
+  <div class="panel"><h3>Free Starter Plan</h3><h2>PHP 0</h2><p class="muted">Basic inventory ledger, limited campaign drafts, and up to 3 connected shops.</p></div>
+  <div class="panel hero"><h3>Monthly Plan</h3><h2>PHP 399/mo</h2><p class="muted">Advanced insights, loyalty rewards, seller spotlight, and priority storage.</p></div>
+  <div class="panel"><h3>Annual Plan</h3><h2>PHP 3,999/yr</h2><p class="muted">Premium tools, business community, early updates, and multi-platform sync.</p></div>
+  <div class="panel"><h3>Premium Features</h3>
+    <ul class="list">
+      <li>Tiered Loyalty Rewards</li>
+      <li>Seller Spotlight Feature</li>
+      <li>Early Access to New Tool Updates</li>
+      <li>Exclusive Business Community</li>
+      <li>Multi-Platform Synchronization for more than 3 shops</li>
+      <li>Advanced Customer Insights</li>
+      <li>Customizable AI Campaign Drafts</li>
+      <li>Priority Cloud Storage</li>
+      <li>Access to app customizable themes</li>
+    </ul>
+  </div>
+</section>
+
+<nav class="nav">
+  <button onclick="showScreen('ordersScreen')"><span>O</span>Orders</button>
+  <button onclick="showScreen('inventoryScreen')"><span>I</span>Stock</button>
+  <button onclick="showScreen('customersScreen')"><span>C</span>Customers</button>
+  <button onclick="showScreen('campaignScreen')"><span>G</span>Campaign</button>
+  <button onclick="showScreen('profileScreen')"><span>P</span>Profile</button>
+</nav>
+
+</div>
+
+<script>
+const screens=document.querySelectorAll('.screen');
+const nav=document.querySelector('.nav');
+const navButtons=document.querySelectorAll('.nav button');
+const navScreens=['ordersScreen','inventoryScreen','customersScreen','campaignScreen','profileScreen'];
+
+function showScreen(id){
+  screens.forEach(screen=>screen.classList.toggle('active',screen.id===id));
+  nav.style.display=navScreens.includes(id)?'grid':'none';
+  navButtons.forEach(btn=>btn.classList.remove('active'));
+  const index=navScreens.indexOf(id);
+  if(index>=0)navButtons[index].classList.add('active');
+}
+
+function calculateMargin(){
+  document.getElementById('marginResult').innerText='Estimated profit after discount: PHP 214 per unit. Margin remains safe at 31%.';
+}
+
+showScreen('startScreen');
+</script>
+
+</body>
+</html>
